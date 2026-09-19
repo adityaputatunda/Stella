@@ -123,7 +123,10 @@
 
   /* ---------- board: deck left, quiz right ---------- */
   .board{display:grid;gap:22px;align-items:start}
-  @media(min-width:880px){.board{grid-template-columns:272px 1fr;gap:30px}}
+  @media(min-width:880px){
+    .board{grid-template-columns:272px 1fr;gap:30px}
+    .deck{position:sticky;top:clamp(16px,3vh,28px)}
+  }
 
   .deck{background:var(--paper);border:2px solid var(--ink);border-radius:18px;
         box-shadow:var(--shadow);padding:24px 20px 20px;text-align:center}
@@ -220,11 +223,11 @@
   .bio .ipa{font-size:.95rem;margin-top:10px;line-height:1.75;word-break:break-word}
   .bio a{color:var(--teal);font-weight:600}
 
-  .next{display:none;margin-top:18px;background:var(--orange);color:#fff;
+  .next{display:none;margin-top:20px;width:100%;background:var(--orange);color:#fff;
         border:2px solid var(--ink);border-radius:12px;box-shadow:var(--shadow);
-        padding:12px 26px;font-size:1rem;font-weight:800;cursor:pointer;
+        padding:12px 20px;font-size:1rem;font-weight:800;cursor:pointer;
         transition:transform .1s,box-shadow .1s}
-  .next.show{display:inline-block}
+  .next.show{display:block}
   .next:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-lift)}
   .next:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
 
@@ -272,13 +275,15 @@
   @media(max-width:879px){
     .deck{display:grid;grid-template-columns:auto 1fr;column-gap:20px;row-gap:2px;
           align-items:center;text-align:left;padding:20px}
-    .dialwrap{grid-column:1;grid-row:1/3;width:136px;height:136px;margin:0}
+    .dialwrap{grid-column:1;grid-row:1/4;width:136px;height:136px;margin:0}
     .dial{top:14px;left:14px;width:108px;height:108px}
     .dial svg{width:33px;height:33px}
     .dial b{font-size:.58rem;letter-spacing:.12em}
     .clock{grid-column:2;grid-row:1;justify-content:flex-start;margin:0;align-self:end}
     .meta{grid-column:2;grid-row:2;margin:5px 0 0;align-self:start}
-    .dots{grid-column:1/-1;grid-row:3;justify-content:flex-start;margin-top:18px}
+    .next{grid-column:2;grid-row:3;width:auto;justify-self:start;margin-top:12px;
+          padding:11px 22px;font-size:.92rem}
+    .dots{grid-column:1/-1;grid-row:4;justify-content:flex-start;margin-top:18px}
   }
   @media(max-width:420px){
     .mast{gap:16px}
@@ -379,6 +384,7 @@
         </div>
         <div class="clock"><span id="elapsed">0:00</span><em>/</em><span id="total">—:—</span></div>
         <p class="meta" id="clipMeta">Speech Accent Archive</p>
+        <button class="next" id="next">Next clip</button>
         <div class="dots" id="dots"></div>
       </aside>
 
@@ -404,7 +410,6 @@
           </div>
 
           <div class="bio" id="bio"></div>
-          <button class="next" id="next">Next clip</button>
         </div>
       </section>
     </div>
@@ -1000,7 +1005,7 @@ function finishRound(){
   showBio();
   $("next").textContent = run.length >= ROUND_TOTAL ? "See scorecard" : "Next clip";
   $("next").classList.add("show");
-  $("next").focus();
+  $("next").focus({preventScroll:true});
 }
 
 function showBio(){
