@@ -127,20 +127,20 @@
 
   .deck{background:var(--paper);border:2px solid var(--ink);border-radius:18px;
         box-shadow:var(--shadow);padding:24px 20px 20px;text-align:center}
-  .dialwrap{position:relative;width:164px;height:164px;margin:2px auto 0}
+  .dialwrap{position:relative;width:176px;height:176px;margin:2px auto 0}
   .ring{position:absolute;inset:0;pointer-events:none;transform:rotate(-90deg)}
   .ring circle{fill:none;stroke-linecap:round}
-  .ring .bg{stroke:rgba(23,19,15,.12);stroke-width:6}
-  .ring .fg{stroke:var(--orange);stroke-width:6;transition:stroke-dashoffset .18s linear}
-  .dial{position:absolute;top:16px;left:16px;width:132px;height:132px;border-radius:50%;
+  .ring .bg{stroke:rgba(23,19,15,.11);stroke-width:10}
+  .ring .fg{stroke:var(--orange);stroke-width:10;transition:stroke-dashoffset .18s linear}
+  .dial{position:absolute;top:18px;left:18px;width:140px;height:140px;border-radius:50%;
         border:2.5px solid var(--ink);background:var(--paper);cursor:pointer;
-        display:grid;place-content:center;gap:4px;box-shadow:var(--shadow-lift);
-        transition:transform .12s,box-shadow .12s}
-  .dial:hover:not(:disabled){transform:translate(-2px,-2px)}
-  .dial:active:not(:disabled){transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+        display:grid;place-content:center;gap:5px;
+        transition:transform .12s,background .12s}
+  .dial:hover:not(:disabled){background:var(--cream)}
+  .dial:active:not(:disabled){transform:scale(.96)}
   .dial:disabled{opacity:.4;cursor:default}
-  .dial svg{width:36px;height:36px;fill:var(--orange);margin:0 auto}
-  .dial b{font:700 .62rem/1 var(--mono);letter-spacing:.14em}
+  .dial svg{width:42px;height:42px;fill:var(--orange);margin:0 auto}
+  .dial b{font:700 .66rem/1 var(--mono);letter-spacing:.14em}
 
   .clock{display:flex;justify-content:center;gap:7px;margin-top:18px;
          font:600 .74rem/1 var(--mono);color:var(--mute);font-variant-numeric:tabular-nums}
@@ -232,8 +232,12 @@
   .card-screen{display:none}
   .card-screen.show{display:block;animation:rise .3s ease-out}
   .grade{margin:0;font-size:2.8rem;font-weight:800;letter-spacing:-.04em;color:var(--orange)}
-  .final{margin:4px 0 20px;font:600 .78rem/1.5 var(--mono);letter-spacing:.06em;
+  .final{margin:4px 0 8px;font:600 .78rem/1.5 var(--mono);letter-spacing:.06em;
          text-transform:uppercase;color:var(--mute)}
+  .pb{margin:0 0 20px;font-size:.88rem;color:var(--mute)}
+  .pb .nb{display:inline-block;background:var(--mint);border:2px solid var(--teal);
+    color:var(--teal);border-radius:999px;padding:3px 11px;margin-right:9px;
+    font:700 .6rem/1.5 var(--mono);letter-spacing:.1em;text-transform:uppercase}
   table.card{width:100%;border-collapse:collapse;font-size:.9rem;
              background:var(--paper);border:2px solid var(--ink);border-radius:14px;
              box-shadow:var(--shadow);overflow:hidden}
@@ -253,6 +257,7 @@
                 box-shadow:var(--shadow);padding:12px 24px;font-size:1rem;font-weight:800;cursor:pointer;
                 transition:transform .1s,box-shadow .1s}
   .again button.ghost{background:var(--paper);color:var(--ink)}
+  .again button.small{font-size:.8rem;font-weight:600;padding:12px 18px;color:var(--mute)}
   .again button:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-lift)}
   .again button:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
 
@@ -267,10 +272,10 @@
   @media(max-width:879px){
     .deck{display:grid;grid-template-columns:auto 1fr;column-gap:20px;row-gap:2px;
           align-items:center;text-align:left;padding:20px}
-    .dialwrap{grid-column:1;grid-row:1/3;width:128px;height:128px;margin:0}
-    .dial{top:13px;left:13px;width:102px;height:102px}
-    .dial svg{width:29px;height:29px}
-    .dial b{font-size:.56rem;letter-spacing:.12em}
+    .dialwrap{grid-column:1;grid-row:1/3;width:136px;height:136px;margin:0}
+    .dial{top:14px;left:14px;width:108px;height:108px}
+    .dial svg{width:33px;height:33px}
+    .dial b{font-size:.58rem;letter-spacing:.12em}
     .clock{grid-column:2;grid-row:1;justify-content:flex-start;margin:0;align-self:end}
     .meta{grid-column:2;grid-row:2;margin:5px 0 0;align-self:start}
     .dots{grid-column:1/-1;grid-row:3;justify-content:flex-start;margin-top:18px}
@@ -302,6 +307,7 @@
     </div>
     <div class="pills">
       <div class="pill s"><span>SCORE</span><b id="score">0</b></div>
+      <div class="pill"><span>BEST</span><b id="best">—</b></div>
       <div class="pill"><span>CLIP</span><b id="clipno">1/10</b></div>
     </div>
   </div>
@@ -362,9 +368,9 @@
     <div class="board">
       <aside class="deck">
         <div class="dialwrap">
-          <svg class="ring" viewBox="0 0 164 164" aria-hidden="true">
-            <circle class="bg" cx="82" cy="82" r="78"></circle>
-            <circle class="fg" id="ringFg" cx="82" cy="82" r="78"></circle>
+          <svg class="ring" viewBox="0 0 176 176" aria-hidden="true">
+            <circle class="bg" cx="88" cy="88" r="82"></circle>
+            <circle class="fg" id="ringFg" cx="88" cy="88" r="82"></circle>
           </svg>
           <button class="dial" id="play" aria-label="Play clip">
             <svg id="icon" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></svg>
@@ -407,6 +413,7 @@
   <div class="card-screen" id="card-screen">
     <h2 class="grade" id="grade"></h2>
     <p class="final" id="final"></p>
+    <p class="pb" id="pb"></p>
     <table class="card">
       <thead><tr><th>Spoke</th><th>You said</th><th class="p">Points</th></tr></thead>
       <tbody id="rows"></tbody>
@@ -415,6 +422,7 @@
     <div class="again">
       <button id="replay">Play another ten</button>
       <button class="ghost" id="copy">Copy result</button>
+      <button class="ghost small" id="wipe">Reset saved scores</button>
     </div>
   </div>
 
@@ -666,7 +674,7 @@ const shuffle = a => a.sort(()=>Math.random()-0.5);
 const title = s => s.replace(/\b[a-z]/g, c => c.toUpperCase());
 const pad2 = n => String(n).padStart(2,"0");
 
-const RING_C = 2 * Math.PI * 78;
+const RING_C = 2 * Math.PI * 82;
 $("ringFg").style.strokeDasharray = RING_C;
 $("ringFg").style.strokeDashoffset = RING_C;
 const setRing = frac => {
@@ -710,6 +718,53 @@ function buildPool(){
     slugs.forEach(slug => POOL.push({slug, stem, name, path, regions}));
   });
 }
+
+/* ================= saved records ================= */
+/* Per-browser only — GitHub Pages is static, so there's nowhere to put a
+   shared board without a backend. Wrapped in try/catch because Safari in
+   private mode throws on write, and an unavailable store should cost nothing. */
+const STORE_KEY = "stella.records.v1";
+const EMPTY = {runs:0, best:{}, recent:[]};
+
+function loadRecords(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    return raw ? Object.assign({}, EMPTY, JSON.parse(raw)) : Object.assign({}, EMPTY);
+  }catch(e){ return Object.assign({}, EMPTY); }
+}
+function saveRecords(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(RECORDS)); }catch(e){}
+}
+let RECORDS = loadRecords();
+
+function recordRun(total, max, pct){
+  const prev = RECORDS.best[region];
+  const isBest = !prev || pct > prev.pct;
+  RECORDS.runs += 1;
+  if(isBest) RECORDS.best[region] = {pct, total, max, at:Date.now()};
+  RECORDS.recent = [{region, total, max, pct, at:Date.now()}, ...RECORDS.recent].slice(0,20);
+  saveRecords();
+  updateBestPill();
+  return {isBest, prev};
+}
+
+function updateBestPill(){
+  const b = RECORDS.best[region];
+  $("best").textContent = b ? Math.round(b.pct*100) + "%" : "—";
+}
+
+const ago = ts => {
+  const d = Math.floor((Date.now()-ts)/86400000);
+  return d <= 0 ? "today" : d === 1 ? "yesterday" : `${d} days ago`;
+};
+
+$("wipe").onclick = () => {
+  if(!confirm("Delete every saved score on this browser?")) return;
+  RECORDS = Object.assign({}, EMPTY);
+  try{ localStorage.removeItem(STORE_KEY); }catch(e){}
+  updateBestPill();
+  $("pb").textContent = "Saved scores cleared.";
+};
 
 /* ================= scoring ================= */
 const sharedDepth = (a,b) => { let n=0; while(n<a.length && n<b.length && a[n]===b[n]) n++; return n; };
@@ -994,6 +1049,14 @@ function showCard(){
   $("grade").textContent = GRADES.find(g => pct >= g[0])[1];
   $("final").textContent = `${total} of ${max} available · ${Math.round(pct*100)}% · ${region}`;
 
+  const {isBest, prev} = recordRun(total, max, pct);
+  const runs = RECORDS.runs === 1 ? "first run" : `${RECORDS.runs} runs played`;
+  $("pb").innerHTML = isBest
+    ? `<span class="nb">New best</span>${prev
+        ? `Beat your ${Math.round(prev.pct*100)}% in ${region} from ${ago(prev.at)}. ${runs}.`
+        : `First time through ${region}. ${runs}.`}`
+    : `Your best in ${region} is ${Math.round(prev.pct*100)}%, set ${ago(prev.at)}. ${runs}.`;
+
   $("rows").innerHTML = "";
   run.forEach(r=>{
     const tr = document.createElement("tr");
@@ -1042,6 +1105,7 @@ function resetRun(){
   $("score").textContent = "0";
   updateMeter();
   updateStreak();
+  updateBestPill();
   $("card-screen").classList.remove("show");
   $("play-screen").style.display = "";
   newRound();
@@ -1143,6 +1207,7 @@ loadSpeakers().then(found => {
   buildPool();
   updateMeter();
   updateStreak();
+  updateBestPill();
   newRound();
 });
 </script>
