@@ -1,0 +1,14 @@
+# Archive markup pulled down only to extract the slug list. Large, and it's
+# GMU's page rather than anything of ours — harvest.py's output is what matters.
+browse.html
+*.browse.html
+
+# Audio, if you ever mirror it from OSF. Delete this line and commit the files
+# only if you've read the licence section in the README.
+audio/
+
+__pycache__/
+*.pyc
+.venv/
+venv/
+.DS_Store

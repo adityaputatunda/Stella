@@ -1,0 +1,1117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stella — name the accent</title>
+<style>
+  :root{
+    --ink:#17130F;
+    --paper:#FFFDF8;
+    --cream:#FBF3E4;
+    --orange:#DD5F29;
+    --teal:#0E7A63;
+    --mint:#D6EFE3;
+    --amber:#C0850F;
+    --butter:#FAE7C4;
+    --rose:#B2403C;
+    --blush:#F7DEDB;
+    --violet:#5C3B7C;
+    --lilac:#E9DEF3;
+    --mute:#6D6257;
+    --display:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --shadow:4px 4px 0 var(--ink);
+    --shadow-lift:6px 6px 0 var(--ink);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:linear-gradient(155deg,#FDEBC6 0%,#FBF3E4 36%,#E7F2E8 100%) fixed;
+    color:var(--ink);
+    font-family:var(--display);font-size:16px;line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:22px 18px 90px}
+  button{font-family:inherit}
+
+  /* ---------- streak rail ---------- */
+  .streak{display:flex;align-items:center;gap:11px;margin-bottom:18px}
+  .streak .flame{font-size:1.15rem;filter:grayscale(1) opacity(.45);transition:filter .3s}
+  .streak.hot .flame{filter:none}
+  .rail{flex:1;height:16px;border:2px solid var(--ink);border-radius:999px;
+        background:var(--paper);overflow:hidden;display:flex}
+  .rail i{flex:1;border-right:2px solid var(--ink);background:transparent;transition:background .3s}
+  .rail i:last-child{border-right:none}
+  .rail i.on{background:var(--orange)}
+  .streak .lab{font:600 .68rem/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+               color:var(--mute);white-space:nowrap}
+
+  /* ---------- masthead ---------- */
+  .mast{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  h1{margin:0;font-size:2.6rem;font-weight:800;letter-spacing:-.035em;line-height:1}
+  h1 span{color:var(--orange)}
+  .sub{margin:6px 0 0;color:var(--mute);font-size:.9rem;max-width:44ch}
+  .pills{display:flex;gap:8px}
+  .pill{background:var(--paper);border:2px solid var(--ink);border-radius:12px;
+        box-shadow:var(--shadow);padding:8px 15px;text-align:center;min-width:76px}
+  .pill span{display:block;font:600 .6rem/1 var(--mono);letter-spacing:.1em;color:var(--mute)}
+  .pill b{display:block;font-size:1.3rem;font-weight:800;line-height:1.2;font-variant-numeric:tabular-nums}
+  .pill.s b{color:var(--teal)}
+
+  /* ---------- score meter ---------- */
+  .meter{margin:20px 0 16px}
+  .meter-track{position:relative;height:18px;border:2px solid var(--ink);border-radius:999px;
+    overflow:hidden;background:var(--paper);
+    background-image:linear-gradient(90deg,var(--rose) 0%,#C96A2C 26%,var(--amber) 50%,#6F9440 76%,var(--teal) 100%)}
+  .meter-veil{position:absolute;top:0;bottom:0;right:0;left:0;background:var(--paper);
+    transition:left .5s cubic-bezier(.2,.9,.3,1)}
+  .meter-track i{position:absolute;top:0;bottom:0;width:2px;background:var(--ink);opacity:.22;z-index:2}
+  .meter-cap{display:flex;justify-content:space-between;margin-top:8px;gap:12px;
+    font:600 .72rem/1.4 var(--mono);letter-spacing:.04em;color:var(--mute);text-transform:uppercase}
+  .meter-cap b{color:var(--ink);font-size:.85rem}
+
+  /* ---------- banner ---------- */
+  .banner{display:none;background:var(--butter);border:2px solid var(--ink);border-radius:12px;
+    box-shadow:var(--shadow);padding:13px 16px;margin-bottom:16px;font-size:.87rem}
+  .banner.show{display:block}
+  .banner code{font:inherit;font-family:var(--mono);font-size:.82rem;background:rgba(23,19,15,.07);
+    padding:1px 5px;border-radius:4px}
+
+  /* ---------- rules ---------- */
+  .rules{margin-bottom:16px;background:var(--paper);border:2px solid var(--ink);
+         border-radius:12px;box-shadow:var(--shadow)}
+  .rules summary{cursor:pointer;padding:12px 16px;list-style:none;display:flex;
+    justify-content:space-between;align-items:center;
+    font:700 .72rem/1 var(--mono);letter-spacing:.09em;text-transform:uppercase}
+  .rules summary::-webkit-details-marker{display:none}
+  .rules summary::after{content:"+";font-size:1.15rem;font-weight:700}
+  .rules[open] summary::after{content:"–"}
+  .rules .body{padding:2px 16px 18px;border-top:2px solid var(--ink)}
+  .rules h4{margin:16px 0 7px;font:700 .68rem/1 var(--mono);letter-spacing:.1em;
+    text-transform:uppercase;color:var(--orange)}
+  .rules table{width:100%;border-collapse:collapse;font-size:.85rem}
+  .rules td{padding:5px 6px 5px 0;border-bottom:1px dashed rgba(23,19,15,.18)}
+  .rules td:last-child{text-align:right;white-space:nowrap;font-weight:700;
+    font-variant-numeric:tabular-nums}
+  .rules p{margin:10px 0 0;font-size:.84rem;color:var(--mute)}
+  .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px;
+      vertical-align:0;border:1.5px solid var(--ink)}
+  .sw.t{background:var(--teal)} .sw.a{background:var(--amber)}
+  .sw.m{background:var(--rose)} .sw.o{background:var(--paper)}
+
+  /* ---------- regions ---------- */
+  .regions{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px}
+  .chip{background:var(--paper);border:2px solid var(--ink);border-radius:999px;
+        padding:6px 14px;font-size:.82rem;font-weight:600;cursor:pointer;
+        box-shadow:2px 2px 0 var(--ink);transition:transform .1s,box-shadow .1s,background .12s}
+  .chip:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
+  .chip:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
+  .chip[aria-pressed=true]{background:var(--ink);color:var(--cream)}
+
+  /* ---------- dial ---------- */
+  .stage{background:var(--paper);border:2px solid var(--ink);border-radius:18px;
+         box-shadow:var(--shadow);padding:26px 22px 22px;text-align:center}
+  .dots{display:flex;gap:6px;justify-content:center;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+  .dots i{width:11px;height:11px;border-radius:50%;border:2px solid var(--ink);
+          background:var(--paper);display:block}
+  .dots i.exact{background:var(--teal)}
+  .dots i.near{background:var(--amber)}
+  .dots i.far{background:var(--blush)}
+  .dots i.miss{background:var(--paper);opacity:.45}
+  .dots i.now{background:var(--orange);box-shadow:0 0 0 4px rgba(221,95,41,.2)}
+  .dots span{margin-left:6px;font:600 .65rem/1 var(--mono);letter-spacing:.09em;
+             text-transform:uppercase;color:var(--mute)}
+
+  .dial{width:158px;height:158px;margin:0 auto;border-radius:50%;
+        border:2.5px solid var(--ink);background:var(--paper);cursor:pointer;
+        display:grid;place-content:center;gap:5px;
+        box-shadow:0 0 0 11px rgba(23,19,15,.055), 0 0 0 24px rgba(23,19,15,.03), var(--shadow-lift);
+        transition:transform .12s,box-shadow .12s}
+  .dial:hover:not(:disabled){transform:translate(-2px,-2px)}
+  .dial:active:not(:disabled){transform:translate(2px,2px);box-shadow:0 0 0 11px rgba(23,19,15,.055),0 0 0 24px rgba(23,19,15,.03),2px 2px 0 var(--ink)}
+  .dial:disabled{opacity:.4;cursor:default}
+  .dial svg{width:44px;height:44px;fill:var(--orange);margin:0 auto}
+  .dial b{font:700 .66rem/1 var(--mono);letter-spacing:.14em}
+  .dial.playing{box-shadow:0 0 0 11px rgba(221,95,41,.16), 0 0 0 24px rgba(221,95,41,.08), var(--shadow-lift)}
+
+  .meta{margin:16px 0 0;font:600 .66rem/1.5 var(--mono);letter-spacing:.11em;
+        text-transform:uppercase;color:var(--mute)}
+  .scrub{margin:14px auto 0;max-width:420px}
+  .ticks{position:relative;height:26px;border-bottom:2px solid var(--ink);cursor:pointer}
+  .ticks i{position:absolute;bottom:0;width:1.5px;background:rgba(23,19,15,.3);height:6px}
+  .ticks i.five{height:12px;background:rgba(23,19,15,.5)}
+  .fill{position:absolute;left:0;bottom:0;top:0;background:rgba(221,95,41,.16);
+        border-right:2px solid var(--orange);width:0}
+  .clock{display:flex;justify-content:space-between;margin-top:6px;
+         font:600 .68rem/1 var(--mono);color:var(--mute);font-variant-numeric:tabular-nums}
+  .status{min-height:20px;margin:14px 0 0;font-size:.82rem;color:var(--mute)}
+  .status.bad{color:var(--rose);font-weight:600}
+
+  /* ---------- questions ---------- */
+  .qhead{margin:28px 0 14px;font-size:1.5rem;font-weight:800;letter-spacing:-.02em}
+  .options{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  @media(max-width:700px){.options{grid-template-columns:1fr 1fr}}
+  @media(max-width:430px){.options{grid-template-columns:1fr}}
+  .opt{text-align:left;background:var(--paper);border:2px solid var(--ink);border-radius:12px;
+       box-shadow:var(--shadow);padding:11px 14px 13px;cursor:pointer;color:inherit;
+       transition:transform .1s,box-shadow .1s,background .12s}
+  .opt:hover:not(:disabled){transform:translate(-2px,-2px);box-shadow:var(--shadow-lift)}
+  .opt:active:not(:disabled){transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+  .opt:disabled{cursor:default;transform:none}
+  .opt kbd{display:block;font:600 .62rem/1 var(--mono);letter-spacing:.1em;color:var(--mute);margin-bottom:5px}
+  .opt span{display:block;font-size:1.02rem;font-weight:700;letter-spacing:-.01em}
+  .opt.exact{background:var(--mint);border-color:var(--teal);box-shadow:4px 4px 0 var(--teal)}
+  .opt.exact kbd{color:var(--teal)}
+  .opt.near{background:var(--butter);border-color:var(--amber);box-shadow:4px 4px 0 var(--amber)}
+  .opt.near kbd{color:var(--amber)}
+  .opt.miss{background:var(--blush);border-color:var(--rose);box-shadow:4px 4px 0 var(--rose)}
+  .opt.miss kbd{color:var(--rose)}
+  .opt:focus-visible,button:focus-visible{outline:3px solid var(--violet);outline-offset:3px}
+
+  /* ---------- reveal ---------- */
+  .verdict{display:none;margin-top:24px}
+  .verdict.show{display:block;animation:rise .28s ease-out}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .slab{background:var(--paper);border:2px solid var(--ink);border-radius:16px;
+        box-shadow:var(--shadow);padding:18px 20px}
+  .slab.exact{background:var(--mint)}
+  .slab.near{background:var(--butter)}
+  .slab.far,.slab.miss{background:var(--blush)}
+  .slab .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .slab h2{margin:0;font-size:1.9rem;font-weight:800;letter-spacing:-.03em}
+  .gain{margin-left:auto;background:var(--ink);color:var(--cream);border-radius:999px;
+        padding:6px 14px;font-size:1.05rem;font-weight:800;font-variant-numeric:tabular-nums}
+  .badge{font:700 .62rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;
+    padding:5px 10px;border-radius:999px;background:var(--lilac);color:var(--violet);
+    border:2px solid var(--violet)}
+  .badge.d3{background:#F3DFD0;color:#8A4418;border-color:#8A4418}
+  .badge.d4{background:#F2D6DE;color:#8C2B4E;border-color:#8C2B4E}
+  .slab p{margin:10px 0 0;font-size:.92rem}
+  .slab .math{margin-top:7px;font:600 .74rem/1.55 var(--mono);color:var(--mute)}
+
+  .stage2{display:none;margin-top:20px}
+  .stage2.show{display:block}
+  .q2{margin:0 0 12px;font-size:1.2rem;font-weight:800;letter-spacing:-.02em}
+  .q2 em{font-style:normal;color:var(--orange)}
+
+  .bio{display:none;margin-top:18px;background:var(--paper);border:2px solid var(--ink);
+       border-radius:14px;box-shadow:var(--shadow);padding:16px 18px}
+  .bio.show{display:block}
+  .bio dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:7px 18px;font-size:.9rem}
+  .bio dt{font:600 .64rem/1.7 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+  .bio dd{margin:0;font-weight:600}
+  .bio dd mark{background:var(--butter);border-bottom:2px solid var(--amber);
+               color:inherit;padding:0 4px;border-radius:3px}
+  .bio details{margin-top:14px;border-top:2px dashed rgba(23,19,15,.18);padding-top:12px}
+  .bio summary{cursor:pointer;font:600 .68rem/1 var(--mono);letter-spacing:.08em;
+               text-transform:uppercase;color:var(--mute)}
+  .bio summary:hover{color:var(--ink)}
+  .bio .ipa{font-size:.95rem;margin-top:10px;line-height:1.75;word-break:break-word}
+  .bio a{color:var(--teal);font-weight:600}
+
+  .next{display:none;margin-top:20px;background:var(--orange);color:#fff;
+        border:2px solid var(--ink);border-radius:12px;box-shadow:var(--shadow);
+        padding:13px 26px;font-size:1rem;font-weight:800;cursor:pointer;
+        transition:transform .1s,box-shadow .1s}
+  .next.show{display:inline-block}
+  .next:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-lift)}
+  .next:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+
+  /* ---------- scorecard ---------- */
+  .card-screen{display:none}
+  .card-screen.show{display:block;animation:rise .3s ease-out}
+  .grade{margin:0;font-size:3rem;font-weight:800;letter-spacing:-.04em;color:var(--orange)}
+  .final{margin:4px 0 22px;font:600 .8rem/1.5 var(--mono);letter-spacing:.06em;
+         text-transform:uppercase;color:var(--mute)}
+  table.card{width:100%;border-collapse:collapse;font-size:.9rem;
+             background:var(--paper);border:2px solid var(--ink);border-radius:14px;
+             box-shadow:var(--shadow);overflow:hidden}
+  table.card th{text-align:left;font:700 .62rem/1 var(--mono);letter-spacing:.1em;
+     text-transform:uppercase;color:var(--mute);border-bottom:2px solid var(--ink);padding:11px 12px}
+  table.card td{padding:10px 12px;border-bottom:1px dashed rgba(23,19,15,.16);vertical-align:top}
+  table.card tr:last-child td{border-bottom:none}
+  table.card td.p{text-align:right;white-space:nowrap;font-weight:800;font-variant-numeric:tabular-nums}
+  table.card td.p small{display:block;font:600 .64rem/1.4 var(--mono);color:var(--mute)}
+  table.card td .w{color:var(--mute);font-weight:500}
+  tr.exact td:first-child{box-shadow:inset 5px 0 0 var(--teal)}
+  tr.near td:first-child{box-shadow:inset 5px 0 0 var(--amber)}
+  tr.far td:first-child,tr.miss td:first-child{box-shadow:inset 5px 0 0 var(--rose)}
+  .readout{margin:20px 0 0;color:var(--mute);font-size:.9rem;max-width:64ch}
+  .again{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+  .again button{background:var(--orange);color:#fff;border:2px solid var(--ink);border-radius:12px;
+                box-shadow:var(--shadow);padding:13px 24px;font-size:1rem;font-weight:800;cursor:pointer;
+                transition:transform .1s,box-shadow .1s}
+  .again button.ghost{background:var(--paper);color:var(--ink)}
+  .again button:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-lift)}
+  .again button:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+
+  footer{margin-top:46px;padding-top:18px;border-top:2px dashed rgba(23,19,15,.2);
+         font-size:.78rem;color:var(--mute);max-width:66ch}
+  footer a{color:var(--teal)}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="streak" id="streakRail">
+    <span class="flame">🔥</span>
+    <div class="rail" id="rail"></div>
+    <span class="lab" id="streakLab">no streak yet</span>
+  </div>
+
+  <div class="mast">
+    <div>
+      <h1>Please call <span>Stella</span></h1>
+      <p class="sub">Ten clips, one paragraph, every accent in the world. Name the language, then place the voice.</p>
+    </div>
+    <div class="pills">
+      <div class="pill s"><span>SCORE</span><b id="score">0</b></div>
+      <div class="pill"><span>CLIP</span><b id="clipno">1/10</b></div>
+    </div>
+  </div>
+
+  <div class="meter">
+    <div class="meter-track">
+      <i style="left:40%"></i><i style="left:60%"></i><i style="left:80%"></i>
+      <div class="meter-veil" id="veil" style="left:0"></div>
+    </div>
+    <div class="meter-cap">
+      <span id="meterText">nothing scored yet</span>
+      <span id="meterGrade"></span>
+    </div>
+  </div>
+
+  <div class="banner" id="banner"></div>
+
+  <details class="rules">
+    <summary>How scoring works</summary>
+    <div class="body">
+      <h4>One — the language</h4>
+      <table>
+        <tr><td><span class="sw t"></span>Exact language</td><td>100</td></tr>
+        <tr><td><span class="sw a"></span>Same branch — Telugu for Tamil</td><td>60</td></tr>
+        <tr><td><span class="sw m"></span>Same family, other branch — Hindi for Persian</td><td>30</td></tr>
+        <tr><td><span class="sw o"></span>Different family entirely</td><td>0</td></tr>
+        <tr><td>Answered on one listen, no replay</td><td>×1.25</td></tr>
+      </table>
+
+      <h4>Difficulty — how much accent survives</h4>
+      <table>
+        <tr><td>Textbook — late learner, classroom, never left home</td><td>×1.0</td></tr>
+        <tr><td>Worn — some immersion</td><td>×1.25</td></tr>
+        <tr><td>Eroded — early onset plus real exposure</td><td>×1.5</td></tr>
+        <tr><td>Near-native — childhood onset, immersed, resident for years</td><td>×1.8</td></tr>
+      </table>
+      <p>Built from the speaker's age of English onset, how they learned it, and how
+      long they've lived in an English-speaking country. An early start only counts
+      for much if immersion backed it up — a classroom learner who never left home
+      keeps their accent whatever age they began. It stays hidden until the reveal:
+      telling you up front would give away half the birthplace question.</p>
+
+      <h4>Two — the birthplace</h4>
+      <table>
+        <tr><td><span class="sw t"></span>Exact country</td><td>50</td></tr>
+        <tr><td><span class="sw a"></span>Right continent, wrong country</td><td>20</td></tr>
+        <tr><td><span class="sw o"></span>Neither</td><td>0</td></tr>
+      </table>
+      <p>Native language is a poor proxy for accent — a French speaker born in
+      Douala and one born in Lyon share a label and nothing else. No difficulty
+      multiplier here; it isn't a listening task.</p>
+    </div>
+  </details>
+
+  <div class="regions" id="regions"></div>
+
+  <div id="play-screen">
+    <div class="stage">
+      <div class="dots" id="dots"></div>
+      <button class="dial" id="play" aria-label="Play clip">
+        <svg id="icon" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></svg>
+        <b id="dialLabel">LISTEN</b>
+      </button>
+      <p class="meta" id="clipMeta">Speech Accent Archive · one paragraph</p>
+      <div class="scrub">
+        <div class="ticks" id="ticks"><div class="fill" id="fill"></div></div>
+        <div class="clock"><span id="elapsed">0:00</span><span id="total">—:—</span></div>
+      </div>
+      <p class="status" id="status">Answer on one listen for a 25% bonus.</p>
+    </div>
+
+    <h2 class="qhead">Which language does this speaker think in?</h2>
+    <div class="options" id="options"></div>
+
+    <div class="verdict" id="verdict">
+      <div class="slab" id="slab">
+        <div class="top">
+          <h2 id="answer"></h2>
+          <span id="badgeSlot"></span>
+          <span class="gain" id="gain"></span>
+        </div>
+        <p id="detail"></p>
+        <p class="math" id="math"></p>
+      </div>
+
+      <div class="stage2" id="stage2">
+        <p class="q2" id="placeq"></p>
+        <div class="options" id="placeopts"></div>
+      </div>
+
+      <div class="bio" id="bio"></div>
+      <button class="next" id="next">Next clip</button>
+    </div>
+  </div>
+
+  <div class="card-screen" id="card-screen">
+    <h2 class="grade" id="grade"></h2>
+    <p class="final" id="final"></p>
+    <table class="card">
+      <thead><tr><th>Spoke</th><th>You said</th><th class="p">Points</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p class="readout" id="readout"></p>
+    <div class="again">
+      <button id="replay">Play another ten</button>
+      <button class="ghost" id="copy">Copy result</button>
+    </div>
+  </div>
+
+  <footer>
+    Recordings stream directly from the Speech Accent Archive and are not copied here.
+    Speaker biographies and transcriptions are a cached extract of the same archive,
+    redistributed under its licence. Weinberger, Steven H. (2015).
+    <i>Speech Accent Archive</i>. George Mason University.
+    <a href="https://accent.gmu.edu/">accent.gmu.edu</a> —
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.
+    Non-commercial use only.
+  </footer>
+
+</div>
+
+<script>
+/* ================= config ================= */
+const AUDIO_URL  = slug => `https://accent.gmu.edu/audio/${slug}.mp3`;
+const SAMPLE_URL = slug => `https://accent.gmu.edu/samples/${slug}/`;
+const ROUND_TOTAL = 10;
+const MAX_OPTIONS = 6;
+const PLACE_OPTIONS = 4;
+const FIRST_LISTEN_BONUS = 0.25;
+const PLACE_EXACT = 50;
+const PLACE_NEAR  = 20;
+const STREAK_RAIL = 5;
+
+/* Where speakers.js / speakers.json might be. Script tags aren't subject to
+   CORS, so the .js form works from file://; the .json fallback needs HTTP. */
+const DATA_DIRS = ["", "metadata/", "fetch/", "data/"];
+
+let META = {};
+
+const REGIONS = ["World","Africa","Americas","Caucasus & Central Asia","East Asia",
+                 "Europe","Middle East","South Asia","Southeast Asia"];
+
+const SPEC = [
+  ["english","English",["Indo-European","Germanic"],6,["Europe","Americas"]],
+  ["german","German",["Indo-European","Germanic"],4,["Europe"]],
+  ["dutch","Dutch",["Indo-European","Germanic"],4,["Europe"]],
+  ["swedish","Swedish",["Indo-European","Germanic"],2,["Europe"]],
+  ["norwegian","Norwegian",["Indo-European","Germanic"],2,["Europe"]],
+  ["danish","Danish",["Indo-European","Germanic"],2,["Europe"]],
+  ["icelandic","Icelandic",["Indo-European","Germanic"],1,["Europe"]],
+  ["afrikaans","Afrikaans",["Indo-European","Germanic"],2,["Africa"]],
+  ["spanish","Spanish",["Indo-European","Romance"],5,["Europe","Americas"]],
+  ["french","French",["Indo-European","Romance"],5,["Europe","Africa"]],
+  ["portuguese","Portuguese",["Indo-European","Romance"],4,["Europe","Americas"]],
+  ["italian","Italian",["Indo-European","Romance"],4,["Europe"]],
+  ["romanian","Romanian",["Indo-European","Romance"],2,["Europe"]],
+  ["catalan","Catalan",["Indo-European","Romance"],1,["Europe"]],
+  ["russian","Russian",["Indo-European","Slavic"],5,["Europe"]],
+  ["polish","Polish",["Indo-European","Slavic"],3,["Europe"]],
+  ["ukrainian","Ukrainian",["Indo-European","Slavic"],2,["Europe"]],
+  ["bulgarian","Bulgarian",["Indo-European","Slavic"],2,["Europe"]],
+  ["serbian","Serbian",["Indo-European","Slavic"],2,["Europe"]],
+  ["czech","Czech",["Indo-European","Slavic"],2,["Europe"]],
+  ["greek","Greek",["Indo-European","Hellenic"],2,["Europe"]],
+  ["albanian","Albanian",["Indo-European","Albanian"],2,["Europe"]],
+  ["lithuanian","Lithuanian",["Indo-European","Baltic"],1,["Europe"]],
+  ["latvian","Latvian",["Indo-European","Baltic"],1,["Europe"]],
+  ["armenian","Armenian",["Indo-European","Armenian"],2,["Caucasus & Central Asia","Middle East"]],
+  ["hindi","Hindi",["Indo-European","Indo-Aryan"],3,["South Asia"]],
+  ["urdu","Urdu",["Indo-European","Indo-Aryan"],3,["South Asia"]],
+  ["bengali","Bengali",["Indo-European","Indo-Aryan"],3,["South Asia"]],
+  ["gujarati","Gujarati",["Indo-European","Indo-Aryan"],2,["South Asia"]],
+  ["punjabi","Punjabi",["Indo-European","Indo-Aryan"],2,["South Asia"]],
+  ["marathi","Marathi",["Indo-European","Indo-Aryan"],2,["South Asia"]],
+  ["nepali","Nepali",["Indo-European","Indo-Aryan"],2,["South Asia"]],
+  ["sinhalese","Sinhala",["Indo-European","Indo-Aryan"],1,["South Asia"]],
+  ["farsi","Persian",["Indo-European","Iranian"],3,["Middle East"]],
+  ["pashto","Pashto",["Indo-European","Iranian"],2,["South Asia"]],
+  ["kurdish","Kurdish",["Indo-European","Iranian"],2,["Middle East"]],
+  ["tamil","Tamil",["Dravidian"],3,["South Asia"]],
+  ["telugu","Telugu",["Dravidian"],2,["South Asia"]],
+  ["malayalam","Malayalam",["Dravidian"],2,["South Asia"]],
+  ["kannada","Kannada",["Dravidian"],2,["South Asia"]],
+  ["mandarin","Mandarin",["Sino-Tibetan","Sinitic"],5,["East Asia"]],
+  ["cantonese","Cantonese",["Sino-Tibetan","Sinitic"],3,["East Asia"]],
+  ["tibetan","Tibetan",["Sino-Tibetan","Tibeto-Burman"],1,["East Asia"]],
+  ["burmese","Burmese",["Sino-Tibetan","Tibeto-Burman"],2,["Southeast Asia"]],
+  ["arabic","Arabic",["Afro-Asiatic","Semitic"],5,["Middle East","Africa"]],
+  ["hebrew","Hebrew",["Afro-Asiatic","Semitic"],2,["Middle East"]],
+  ["amharic","Amharic",["Afro-Asiatic","Semitic"],2,["Africa"]],
+  ["somali","Somali",["Afro-Asiatic","Cushitic"],2,["Africa"]],
+  ["hausa","Hausa",["Afro-Asiatic","Chadic"],2,["Africa"]],
+  ["swahili","Swahili",["Niger-Congo","Bantu"],2,["Africa"]],
+  ["zulu","Zulu",["Niger-Congo","Bantu"],2,["Africa"]],
+  ["xhosa","Xhosa",["Niger-Congo","Bantu"],1,["Africa"]],
+  ["yoruba","Yoruba",["Niger-Congo","Volta-Niger"],2,["Africa"]],
+  ["igbo","Igbo",["Niger-Congo","Volta-Niger"],2,["Africa"]],
+  ["wolof","Wolof",["Niger-Congo","Atlantic"],1,["Africa"]],
+  ["turkish","Turkish",["Turkic"],4,["Middle East","Europe"]],
+  ["azerbaijani","Azerbaijani",["Turkic"],2,["Caucasus & Central Asia"]],
+  ["kazakh","Kazakh",["Turkic"],2,["Caucasus & Central Asia"]],
+  ["uzbek","Uzbek",["Turkic"],2,["Caucasus & Central Asia"]],
+  ["finnish","Finnish",["Uralic"],2,["Europe"]],
+  ["hungarian","Hungarian",["Uralic"],2,["Europe"]],
+  ["estonian","Estonian",["Uralic"],1,["Europe"]],
+  ["tagalog","Tagalog",["Austronesian"],3,["Southeast Asia"]],
+  ["indonesian","Indonesian",["Austronesian"],2,["Southeast Asia"]],
+  ["malay","Malay",["Austronesian"],2,["Southeast Asia"]],
+  ["vietnamese","Vietnamese",["Austroasiatic"],3,["Southeast Asia"]],
+  ["khmer","Khmer",["Austroasiatic"],2,["Southeast Asia"]],
+  ["thai","Thai",["Kra-Dai"],3,["Southeast Asia"]],
+  ["lao","Lao",["Kra-Dai"],1,["Southeast Asia"]],
+  ["japanese","Japanese",["Japonic"],4,["East Asia"]],
+  ["korean","Korean",["Koreanic"],4,["East Asia"]],
+  ["georgian","Georgian",["Kartvelian"],2,["Caucasus & Central Asia"]],
+  ["mongolian","Mongolian",["Mongolic"],2,["East Asia","Caucasus & Central Asia"]],
+  ["hmong","Hmong",["Hmong-Mien"],2,["Southeast Asia"]],
+  ["quechua","Quechua",["Quechuan"],1,["Americas"]],
+  ["basque","Basque",["Isolate"],1,["Europe"]],
+];
+
+const HOMELANDS = {
+  english:["usa","uk","ireland","australia","canada","new zealand","south africa","india","jamaica","singapore","nigeria"],
+  french:["france","cameroon","senegal","canada","belgium","switzerland","haiti","ivory coast","morocco","algeria","congo","tunisia"],
+  spanish:["spain","mexico","argentina","colombia","peru","cuba","chile","venezuela","dominican republic","ecuador","guatemala"],
+  portuguese:["portugal","brazil","angola","mozambique","cape verde"],
+  arabic:["egypt","morocco","lebanon","saudi arabia","iraq","jordan","syria","algeria","sudan","tunisia","yemen","palestine","libya","kuwait","united arab emirates"],
+  mandarin:["china","taiwan","singapore","malaysia"],
+  cantonese:["hong kong","china","malaysia","canada"],
+  hindi:["india","nepal","fiji"],
+  urdu:["pakistan","india"],
+  bengali:["bangladesh","india"],
+  punjabi:["india","pakistan"],
+  gujarati:["india","kenya","tanzania"],
+  tamil:["india","sri lanka","singapore","malaysia"],
+  telugu:["india"], malayalam:["india"], kannada:["india"], marathi:["india"],
+  nepali:["nepal","india","bhutan"], sinhalese:["sri lanka"],
+  pashto:["afghanistan","pakistan"],
+  farsi:["iran","afghanistan","tajikistan"],
+  kurdish:["iraq","turkey","iran","syria"],
+  russian:["russia","ukraine","kazakhstan","belarus","uzbekistan","latvia"],
+  german:["germany","austria","switzerland"],
+  dutch:["netherlands","belgium","suriname"],
+  swahili:["kenya","tanzania","uganda","congo"],
+  amharic:["ethiopia"], somali:["somalia","ethiopia","djibouti"],
+  hausa:["nigeria","niger","ghana"],
+  yoruba:["nigeria","benin"], igbo:["nigeria"], wolof:["senegal","gambia"],
+  zulu:["south africa"], xhosa:["south africa"], afrikaans:["south africa","namibia"],
+  turkish:["turkey","cyprus","germany","bulgaria"],
+  korean:["south korea","north korea"], japanese:["japan"],
+  vietnamese:["vietnam"], thai:["thailand"], lao:["laos"], khmer:["cambodia"],
+  burmese:["myanmar"], hmong:["laos","vietnam","thailand","china"],
+  tagalog:["philippines"], indonesian:["indonesia"], malay:["malaysia","singapore","brunei"],
+  armenian:["armenia","lebanon","iran","russia"],
+  quechua:["peru","bolivia","ecuador"],
+  italian:["italy","switzerland"], greek:["greece","cyprus"],
+  polish:["poland"], ukrainian:["ukraine"], bulgarian:["bulgaria"],
+  serbian:["serbia","bosnia","montenegro"], czech:["czech republic"],
+  romanian:["romania","moldova"], catalan:["spain","andorra"],
+  albanian:["albania","kosovo","macedonia"], basque:["spain","france"],
+  hungarian:["hungary","romania","slovakia"], finnish:["finland"], estonian:["estonia"],
+  swedish:["sweden","finland"], norwegian:["norway"], danish:["denmark"],
+  icelandic:["iceland"], lithuanian:["lithuania"], latvian:["latvia"],
+  georgian:["georgia"], azerbaijani:["azerbaijan","iran"],
+  kazakh:["kazakhstan"], uzbek:["uzbekistan"], mongolian:["mongolia","china"],
+  hebrew:["israel"], tibetan:["china","india","nepal"],
+};
+
+const CONTINENT = {};
+const addC = (c, list) => list.forEach(n => CONTINENT[n] = c);
+addC("Africa",["cameroon","senegal","nigeria","kenya","tanzania","uganda","ghana","ethiopia",
+  "somalia","south africa","morocco","algeria","tunisia","libya","egypt","sudan","ivory coast",
+  "congo","zimbabwe","zambia","mali","burkina faso","angola","mozambique","cape verde","rwanda",
+  "malawi","botswana","namibia","liberia","sierra leone","gambia","guinea","benin","togo","niger",
+  "chad","eritrea","djibouti","madagascar"]);
+addC("Europe",["france","uk","united kingdom","england","scotland","wales","ireland","germany",
+  "austria","switzerland","netherlands","belgium","spain","portugal","italy","greece","sweden",
+  "norway","denmark","finland","iceland","poland","czech republic","slovakia","hungary","romania",
+  "bulgaria","serbia","croatia","bosnia","albania","macedonia","slovenia","ukraine","belarus",
+  "russia","lithuania","latvia","estonia","moldova","montenegro","kosovo","cyprus","malta",
+  "luxembourg","andorra"]);
+addC("Asia",["china","taiwan","japan","south korea","north korea","korea","mongolia","vietnam",
+  "thailand","laos","cambodia","myanmar","burma","malaysia","singapore","indonesia","philippines",
+  "india","pakistan","bangladesh","sri lanka","nepal","bhutan","afghanistan","kazakhstan",
+  "uzbekistan","kyrgyzstan","tajikistan","turkmenistan","tibet","hong kong","macau","brunei",
+  "maldives"]);
+addC("Middle East",["iran","iraq","turkey","syria","lebanon","israel","palestine","jordan",
+  "saudi arabia","yemen","oman","united arab emirates","kuwait","qatar","bahrain","armenia",
+  "azerbaijan","georgia"]);
+addC("Americas",["usa","united states","canada","mexico","brazil","argentina","chile","peru",
+  "colombia","venezuela","ecuador","bolivia","paraguay","uruguay","cuba","haiti",
+  "dominican republic","jamaica","trinidad","puerto rico","guatemala","honduras","el salvador",
+  "nicaragua","costa rica","panama","guyana","suriname","belize"]);
+addC("Oceania",["australia","new zealand","fiji","papua new guinea","samoa","tonga"]);
+
+const GLOBAL_FALLBACK = ["france","brazil","nigeria","japan","russia","egypt","india","mexico",
+  "germany","vietnam","kenya","turkey","peru","poland","indonesia"];
+
+/* ================= difficulty ================= */
+/* How much of the first language is still audible. An early onset only erodes
+   an accent if immersion backed it up — a classroom learner who never left home
+   keeps theirs whatever age they started, which is why onset is halved when
+   there's no exposure to speak of. */
+const DIFF_TIERS = [
+  [5.0, 1.8, "Near-native", "d4", "Immersed since childhood. Almost nothing of the first language survives."],
+  [3.5, 1.5, "Eroded",      "d3", "Early onset plus real exposure — the accent is well worn down."],
+  [2.0, 1.25,"Worn",        "",   "Some immersion. The first language shows, but not loudly."],
+  [-1,  1.0, "Textbook",    "",   "Late or classroom learner who stayed put. The first language is right on the surface."],
+];
+
+function yearsOf(s){
+  if(!s) return NaN;
+  const m = String(s).match(/([\d.]+)\s*(year|month|week|day)/i);
+  if(!m) return NaN;
+  const n = parseFloat(m[1]);
+  return /month/i.test(m[2]) ? n/12 : /week/i.test(m[2]) ? n/52 : /day/i.test(m[2]) ? n/365 : n;
+}
+
+function difficulty(m){
+  const none = {mult:1, label:null, cls:"", note:"", d:0};
+  if(!m) return none;
+  const onset = parseFloat(m["age of english onset"]);
+  const yrs = yearsOf(m["length of english residence"]);
+  const natural = /natural/i.test(m["english learning method"] || "");
+  if(!isFinite(onset) && !isFinite(yrs)) return none;
+
+  const exposure = (isFinite(yrs) && yrs >= 1) || natural;
+  let onsetPts = isFinite(onset) ? (onset <= 5 ? 3 : onset <= 10 ? 2 : onset <= 17 ? 1 : 0) : 0;
+  if(!exposure) onsetPts *= 0.5;
+
+  let d = onsetPts;
+  if(isFinite(yrs)) d += yrs >= 15 ? 2 : yrs >= 7 ? 1.5 : yrs >= 3 ? 1 : 0;
+  if(natural) d += 1;
+
+  const [,mult,label,cls,note] = DIFF_TIERS.find(t => d >= t[0]);
+  return {mult, label, cls, note, d};
+}
+
+/* ================= state ================= */
+const POOL = [];
+const dead = new Set();
+const seen = new Set();
+let region = "World";
+let score = 0, streak = 0, possible = 0;
+let run = [];
+let current = null, currentMeta = null, currentDiff = null;
+let currentOpts = [], placeOpts = [];
+let plays = 0, locked = false;
+
+const audio = new Audio();
+audio.preload = "none";
+const $ = id => document.getElementById(id);
+const shuffle = a => a.sort(()=>Math.random()-0.5);
+const title = s => s.replace(/\b[a-z]/g, c => c.toUpperCase());
+const pad2 = n => String(n).padStart(2,"0");
+
+/* ================= data loading ================= */
+function tryScript(src){
+  return new Promise(res=>{
+    const s = document.createElement("script");
+    s.src = src;
+    s.onload  = () => res(!!window.SPEAKERS);
+    s.onerror = () => res(false);
+    document.head.appendChild(s);
+  });
+}
+
+async function loadSpeakers(){
+  for(const dir of DATA_DIRS){
+    if(await tryScript(dir + "speakers.js")) return dir + "speakers.js";
+  }
+  if(location.protocol.startsWith("http")){
+    for(const dir of DATA_DIRS){
+      try{
+        const r = await fetch(dir + "speakers.json");
+        if(r.ok){ window.SPEAKERS = await r.json(); return dir + "speakers.json"; }
+      }catch(e){ /* keep looking */ }
+    }
+  }
+  return null;
+}
+
+function buildPool(){
+  POOL.length = 0;
+  const keys = Object.keys(META);
+  SPEC.forEach(([stem,name,path,n,regions])=>{
+    const live = keys.filter(k => k.replace(/\d+$/,"") === stem);
+    const slugs = live.length
+      ? live.sort((a,b) => parseInt(a.match(/\d+$/)[0]) - parseInt(b.match(/\d+$/)[0]))
+      : Array.from({length:n}, (_,i) => stem + (i+1));
+    slugs.forEach(slug => POOL.push({slug, stem, name, path, regions}));
+  });
+}
+
+/* ================= scoring ================= */
+const sharedDepth = (a,b) => { let n=0; while(n<a.length && n<b.length && a[n]===b[n]) n++; return n; };
+function basePoints(guess, truth){
+  if(guess.stem === truth.stem) return 100;
+  const d = sharedDepth(guess.path, truth.path);
+  return d >= 2 ? 60 : d === 1 ? 30 : 0;
+}
+const tierOf = p => p === 100 ? "exact" : p >= 60 ? "near" : p > 0 ? "far" : "miss";
+
+function placePoints(guess, truth){
+  if(guess === truth) return PLACE_EXACT;
+  const a = CONTINENT[guess], b = CONTINENT[truth];
+  return a && b && a === b ? PLACE_NEAR : 0;
+}
+
+const GRADES = [[.80,"Dialect coach"],[.60,"Well travelled"],[.40,"Decent ear"],
+                [.20,"Getting there"],[0,"Tourist"]];
+
+function updateMeter(){
+  const pct = possible ? score / possible * 100 : 0;
+  $("veil").style.left = pct + "%";
+  $("meterText").innerHTML = possible
+    ? `<b>${score}</b> of ${possible} available so far`
+    : "nothing scored yet";
+  $("meterGrade").textContent = possible
+    ? `${Math.round(pct)}% · ${GRADES.find(g => pct/100 >= g[0])[1]}`
+    : "";
+}
+
+function updateStreak(){
+  const rail = $("rail");
+  if(rail.children.length !== STREAK_RAIL){
+    rail.innerHTML = "";
+    for(let i=0;i<STREAK_RAIL;i++) rail.appendChild(document.createElement("i"));
+  }
+  [...rail.children].forEach((el,i)=> el.className = i < Math.min(streak, STREAK_RAIL) ? "on" : "");
+  $("streakRail").classList.toggle("hot", streak > 0);
+  $("streakLab").textContent = streak === 0 ? "no streak yet"
+    : streak === 1 ? "1 exact in a row" : `${streak} exact in a row`;
+}
+
+/* ================= rounds ================= */
+const inRegion = s => region === "World" || s.regions.includes(region);
+const livePool = () => POOL.filter(s => !dead.has(s.slug) && inRegion(s));
+
+function pick(){
+  let p = livePool().filter(s => !seen.has(s.slug));
+  if(!p.length){ seen.clear(); p = livePool(); }
+  return p.length ? p[Math.floor(Math.random()*p.length)] : null;
+}
+
+function buildOptions(truth){
+  const stems = new Map();
+  livePool().forEach(s => { if(s.stem !== truth.stem) stems.set(s.stem, s); });
+  const all  = [...stems.values()];
+  const kin  = all.filter(s => sharedDepth(s.path, truth.path) >= 1);
+  const rest = all.filter(s => sharedDepth(s.path, truth.path) === 0);
+  const want = Math.min(MAX_OPTIONS - 1, all.length);
+  const chosen = [];
+  shuffle(kin).slice(0,2).forEach(k => chosen.push(k));
+  shuffle(rest).forEach(r => { if(chosen.length < want) chosen.push(r); });
+  kin.forEach(k => { if(chosen.length < want && !chosen.includes(k)) chosen.push(k); });
+  return shuffle([truth, ...chosen.slice(0, want)]);
+}
+
+function buildPlaceOptions(stem, truthCountry){
+  const pool = (HOMELANDS[stem] || []).filter(c => c !== truthCountry);
+  const extra = GLOBAL_FALLBACK.filter(c => c !== truthCountry && !pool.includes(c));
+  const picks = [...shuffle(pool), ...shuffle(extra)].slice(0, PLACE_OPTIONS - 1);
+  return shuffle([truthCountry, ...picks]);
+}
+
+function renderDots(){
+  const d = $("dots");
+  d.innerHTML = "";
+  for(let i=0;i<ROUND_TOTAL;i++){
+    const el = document.createElement("i");
+    if(run[i]) el.className = tierOf(run[i].base);
+    else if(i === run.length) el.className = "now";
+    d.appendChild(el);
+  }
+  const s = document.createElement("span");
+  s.textContent = `${Math.min(run.length+1, ROUND_TOTAL)} / ${ROUND_TOTAL}`;
+  d.appendChild(s);
+  $("clipno").textContent = `${Math.min(run.length+1, ROUND_TOTAL)}/${ROUND_TOTAL}`;
+}
+
+function newRound(){
+  locked = false; plays = 0;
+  current = pick();
+  currentMeta = current ? (META[current.slug] || null) : null;
+  currentDiff = difficulty(currentMeta);
+  $("verdict").classList.remove("show");
+  $("stage2").classList.remove("show");
+  $("bio").classList.remove("show");
+  $("next").classList.remove("show");
+  $("math").textContent = "";
+  $("badgeSlot").innerHTML = "";
+  $("fill").style.width = "0";
+  $("elapsed").textContent = "0:00";
+  $("total").textContent = "—:—";
+  $("dialLabel").textContent = "LISTEN";
+  renderDots();
+
+  if(!current){
+    $("status").textContent = "No playable clips in this region. Try another.";
+    $("status").className = "status bad";
+    $("options").innerHTML = "";
+    $("play").disabled = true;
+    return;
+  }
+  seen.add(current.slug);
+  currentOpts = buildOptions(current);
+  renderOptions();
+  audio.src = AUDIO_URL(current.slug);
+  $("status").textContent = "Answer on one listen for a 25% bonus.";
+  $("status").className = "status";
+  $("play").disabled = false;
+}
+
+function renderOptions(){
+  const box = $("options");
+  box.innerHTML = "";
+  currentOpts.forEach((o,i)=>{
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.innerHTML = `<kbd>${pad2(i+1)}</kbd><span>${o.name}</span>`;
+    b.onclick = () => answerLanguage(o);
+    box.appendChild(b);
+  });
+}
+
+/* ---- stage 1: language ---- */
+function answerLanguage(guess){
+  if(locked || !current) return;
+  locked = true;
+  audio.pause();
+
+  const mult  = currentDiff.mult;
+  const base  = basePoints(guess, current);
+  const clean = plays <= 1 && base > 0;
+  const pts   = Math.round(base * (clean ? 1 + FIRST_LISTEN_BONUS : 1) * mult);
+  const roundMax = Math.round(100 * (1 + FIRST_LISTEN_BONUS) * mult);
+
+  score += pts;
+  possible += roundMax;
+  streak = base === 100 ? streak + 1 : 0;
+  $("score").textContent = score;
+  updateMeter();
+  updateStreak();
+
+  [...$("options").children].forEach((el,i)=>{
+    el.disabled = true;
+    const o = currentOpts[i];
+    if(o.stem === current.stem) el.classList.add("exact");
+    else if(o.stem === guess.stem) el.classList.add(base ? "near" : "miss");
+  });
+
+  const family = current.path.join(" › ");
+  let line;
+  if(base === 100)     line = "Exact.";
+  else if(base === 60) line = `${guess.name} is the same branch — ${family}.`;
+  else if(base === 30) line = `${guess.name} is a cousin, not a sibling.`;
+  else                 line = `${guess.name} is a different family altogether.`;
+
+  const tier = tierOf(base);
+  $("slab").className = "slab " + tier;
+  $("answer").textContent = current.name;
+  $("gain").textContent = `+${pts}`;
+  $("badgeSlot").innerHTML = currentDiff.label
+    ? `<span class="badge ${currentDiff.cls}">${currentDiff.label} ×${mult}</span>` : "";
+  $("detail").textContent = `${family}. ${line}` + (clean ? " Answered on one listen." : "");
+
+  const parts = [`${base}`];
+  if(clean) parts.push("×1.25 first listen");
+  if(mult !== 1) parts.push(`×${mult} ${currentDiff.label.toLowerCase()}`);
+  $("math").textContent = (parts.length > 1 ? parts.join(" ") + ` = ${pts}. ` : "") +
+    (currentDiff.note && mult !== 1 ? currentDiff.note : "");
+
+  $("verdict").classList.add("show");
+
+  run.push({name:current.name, guess:guess.name, base, pts, mult,
+            possible:roundMax, place:null, placeGuess:null, placePts:0});
+  renderDots();
+
+  if(currentMeta && currentMeta.country) askPlace(currentMeta.country);
+  else finishRound();
+}
+
+/* ---- stage 2: birthplace ---- */
+function askPlace(truthCountry){
+  placeOpts = buildPlaceOptions(current.stem, truthCountry);
+  $("placeq").innerHTML = `${current.name}, yes — but <em>whose</em> ${current.name}? Where was this speaker born?`;
+  const box = $("placeopts");
+  box.innerHTML = "";
+  placeOpts.forEach((c,i)=>{
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.innerHTML = `<kbd>${pad2(i+1)}</kbd><span>${title(c)}</span>`;
+    b.onclick = () => answerPlace(c, truthCountry);
+    box.appendChild(b);
+  });
+  $("stage2").classList.add("show");
+}
+
+function answerPlace(guess, truth){
+  const pts = placePoints(guess, truth);
+  score += pts;
+  possible += PLACE_EXACT;
+  $("score").textContent = score;
+  updateMeter();
+
+  [...$("placeopts").children].forEach((el,i)=>{
+    el.disabled = true;
+    const c = placeOpts[i];
+    if(c === truth) el.classList.add("exact");
+    else if(c === guess) el.classList.add(pts ? "near" : "miss");
+  });
+
+  const last = run[run.length-1];
+  last.place = title(truth);
+  last.placeGuess = title(guess);
+  last.placePts = pts;
+  last.pts += pts;
+  last.possible += PLACE_EXACT;
+
+  const note = pts === PLACE_EXACT ? "Exactly where."
+             : pts === PLACE_NEAR  ? "Right continent, wrong country."
+             : "Not close.";
+  $("placeq").innerHTML = `${note} <em>+${pts}</em>`;
+  finishRound();
+}
+
+function finishRound(){
+  showBio();
+  $("next").textContent = run.length >= ROUND_TOTAL ? "See scorecard" : "Next clip";
+  $("next").classList.add("show");
+  $("next").focus();
+}
+
+function showBio(){
+  const box = $("bio");
+  const m = currentMeta;
+  const hot = currentDiff.mult !== 1;
+  const rows = [];
+  if(m){
+    const add = (k,label,flag) => {
+      if(!m[k]) return;
+      rows.push([label, flag && hot ? `<mark>${m[k]}</mark>` : m[k]]);
+    };
+    add("birth place","Born");
+    add("age, sex","Age, sex");
+    add("other language(s)","Also speaks");
+    add("age of english onset","English from", true);
+    add("english learning method","Learned", true);
+    add("english residence","Lived in");
+    add("length of english residence","For", true);
+  }
+  let html = rows.length
+    ? "<dl>" + rows.map(([k,v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("") + "</dl>"
+    : `<p style="margin:0;font-size:.88rem;color:var(--mute)">No speaker details held for
+       <code>${current.slug}</code> — re-run <code>harvest.py</code> to add it.</p>`;
+
+  if(m && m.ipa){
+    html += `<details><summary>How they actually said it</summary>
+             <p class="ipa">[${m.ipa}]</p></details>`;
+  }
+  html += `<details><summary>Open this sample on the archive</summary>
+           <p style="margin:10px 0 0;font-size:.88rem">
+           <a href="${SAMPLE_URL(current.slug)}" target="_blank" rel="noopener">${current.slug}</a>
+           </p></details>`;
+  box.innerHTML = html;
+  box.classList.add("show");
+}
+
+/* ================= scorecard ================= */
+const MARKS = {exact:"🟩", near:"🟨", far:"🟧", miss:"⬜"};
+
+function showCard(){
+  const total = run.reduce((a,r)=>a+r.pts, 0);
+  const max   = run.reduce((a,r)=>a+r.possible, 0);
+  const pct   = max ? total / max : 0;
+
+  $("grade").textContent = GRADES.find(g => pct >= g[0])[1];
+  $("final").textContent = `${total} of ${max} available · ${Math.round(pct*100)}% · ${region}`;
+
+  $("rows").innerHTML = "";
+  run.forEach(r=>{
+    const tr = document.createElement("tr");
+    tr.className = tierOf(r.base);
+    const truth = r.place ? `${r.name} <span class="w">· ${r.place}</span>` : r.name;
+    const said  = r.placeGuess ? `${r.guess} <span class="w">· ${r.placeGuess}</span>` : r.guess;
+    const mult  = r.mult !== 1 ? `<small>×${r.mult}</small>` : "";
+    tr.innerHTML = `<td>${truth}</td><td>${said}</td><td class="p">${r.pts}${mult}</td>`;
+    $("rows").appendChild(tr);
+  });
+
+  const exact = run.filter(r=>r.base===100).length;
+  const near  = run.filter(r=>r.base>0 && r.base<100).length;
+  const miss  = run.filter(r=>r.base===0).length;
+  const hard  = run.filter(r=>r.mult >= 1.5);
+  const hardHits = hard.filter(r=>r.base===100).length;
+  const easy  = run.filter(r=>r.mult === 1);
+  const easyHits = easy.filter(r=>r.base===100).length;
+  const places = run.filter(r=>r.place);
+  const placeHits = places.filter(r=>r.placePts === PLACE_EXACT).length;
+
+  let text = `${exact} exact, ${near} in the right family, ${miss} nowhere near. `;
+  text += near > exact
+    ? "You're hearing the family and missing the language, which is a segmental problem. Play two neighbours back to back and listen only for consonants."
+    : miss > exact
+    ? "Start coarser. Decide tone language or not, then stress-timed or syllable-timed, before you try to name anything."
+    : "Prosody and segments are both landing. Try a region you've been avoiding.";
+  if(hard.length && easy.length){
+    text += ` Eroded accents: ${hardHits} of ${hard.length}; textbook ones: ${easyHits} of ${easy.length}.`;
+    if(hardHits === 0)
+      text += " Nothing landed on the worn-down speakers — with those, stop listening for phonemes and listen for rhythm and vowel length, which outlast everything else.";
+  }
+  if(places.length){
+    text += ` Birthplace: ${placeHits} of ${places.length}.`;
+    if(placeHits < places.length / 2)
+      text += " The substrate language is only half the story — regional Englishes carry their own history.";
+  }
+  $("readout").textContent = text;
+
+  $("play-screen").style.display = "none";
+  $("card-screen").classList.add("show");
+}
+
+function resetRun(){
+  run = []; score = 0; streak = 0; possible = 0;
+  $("score").textContent = "0";
+  updateMeter();
+  updateStreak();
+  $("card-screen").classList.remove("show");
+  $("play-screen").style.display = "";
+  newRound();
+}
+
+$("next").onclick   = () => run.length >= ROUND_TOTAL ? showCard() : newRound();
+$("replay").onclick = resetRun;
+$("copy").onclick = () => {
+  const total = run.reduce((a,r)=>a+r.pts,0);
+  const max = run.reduce((a,r)=>a+r.possible,0);
+  const strip = run.map(r=>MARKS[tierOf(r.base)]).join("");
+  navigator.clipboard?.writeText(`Stella — ${region} — ${total}/${max}\n${strip}`)
+    .then(()=> $("copy").textContent = "Copied")
+    .catch(()=> $("copy").textContent = "Copy failed");
+  setTimeout(()=> $("copy").textContent = "Copy result", 1800);
+};
+
+/* ================= regions ================= */
+REGIONS.forEach(r=>{
+  const b = document.createElement("button");
+  b.className = "chip";
+  b.textContent = r;
+  b.setAttribute("aria-pressed", r === region);
+  b.onclick = () => {
+    region = r;
+    [...$("regions").children].forEach(c => c.setAttribute("aria-pressed", c.textContent === r));
+    seen.clear();
+    resetRun();
+  };
+  $("regions").appendChild(b);
+});
+
+/* ================= transport ================= */
+const ICON_PLAY  = "M7 4.5v15l13-7.5z";
+const ICON_PAUSE = "M7 4.5h3.5v15H7zM13.5 4.5H17v15h-3.5z";
+const setIcon = d => $("icon").firstElementChild.setAttribute("d", d);
+
+$("play").onclick = () => audio.paused ? audio.play().catch(()=>{}) : audio.pause();
+audio.addEventListener("play", ()=>{
+  plays++; setIcon(ICON_PAUSE);
+  $("play").classList.add("playing");
+  $("dialLabel").textContent = "PAUSE";
+});
+["pause","ended"].forEach(ev => audio.addEventListener(ev, ()=>{
+  setIcon(ICON_PLAY);
+  $("play").classList.remove("playing");
+  $("dialLabel").textContent = audio.ended ? "AGAIN" : "RESUME";
+}));
+
+const fmt = s => isFinite(s) ? Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0") : "—:—";
+audio.addEventListener("loadedmetadata", ()=>{
+  $("total").textContent = fmt(audio.duration);
+  $("clipMeta").textContent = `Speech Accent Archive · ${Math.round(audio.duration)}s`;
+  drawTicks(audio.duration);
+});
+audio.addEventListener("timeupdate", ()=>{
+  $("elapsed").textContent = fmt(audio.currentTime);
+  if(audio.duration) $("fill").style.width = (audio.currentTime/audio.duration*100)+"%";
+});
+audio.addEventListener("error", ()=>{
+  if(!current || locked) return;
+  dead.add(current.slug);
+  $("status").textContent = `No recording for ${current.slug} — pulling another.`;
+  $("status").className = "status bad";
+  setTimeout(newRound, 500);
+});
+
+function drawTicks(dur){
+  const t = $("ticks");
+  [...t.querySelectorAll("i")].forEach(e=>e.remove());
+  if(!isFinite(dur) || dur <= 0) return;
+  for(let s=1; s<dur; s++){
+    const i = document.createElement("i");
+    i.style.left = (s/dur*100)+"%";
+    if(s % 5 === 0) i.className = "five";
+    t.appendChild(i);
+  }
+}
+$("ticks").onclick = e => {
+  if(!audio.duration) return;
+  const r = e.currentTarget.getBoundingClientRect();
+  audio.currentTime = (e.clientX - r.left)/r.width * audio.duration;
+};
+
+/* ================= keyboard ================= */
+document.addEventListener("keydown", e => {
+  if($("card-screen").classList.contains("show")) return;
+  if(e.key === " "){ e.preventDefault(); $("play").click(); return; }
+  if(e.key === "Enter" && $("next").classList.contains("show")){
+    e.preventDefault(); $("next").click(); return;
+  }
+  if(/^[1-6]$/.test(e.key)){
+    const live = $("stage2").classList.contains("show") && !$("next").classList.contains("show")
+      ? $("placeopts") : $("options");
+    const b = live.children[+e.key - 1];
+    if(b && !b.disabled) b.click();
+  }
+});
+
+/* ================= boot ================= */
+loadSpeakers().then(found => {
+  META = window.SPEAKERS || {};
+  if(!found){
+    const tried = DATA_DIRS.map(d => `<code>${d}speakers.js</code>`).join(", ");
+    $("banner").innerHTML =
+      `<b>No speaker data found.</b> Looked for ${tried}. Without it the birthplace
+       round is skipped and everything scores at ×1.0 difficulty. Run
+       <code>python3 harvest.py browse.html</code>, then put <code>speakers.js</code>
+       next to this page.`;
+    $("banner").classList.add("show");
+  }
+  buildPool();
+  updateMeter();
+  updateStreak();
+  newRound();
+});
+</script>
+</body>
+</html>
